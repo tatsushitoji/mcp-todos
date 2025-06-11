@@ -1,5 +1,5 @@
 "use client";
-
+import { useChat } from "@ai-sdk/react";
 import { useQuery } from "@tanstack/react-query";
 
 type Todo = {
@@ -19,6 +19,11 @@ export default function Home() {
     queryFn: getTodos,
   }) as { data: Todo[] | undefined };
 
+  const { messages, input, handleInputChange, handleSubmit } = useChat({
+    api: "/api/chat",
+    experimental_throttle: 50,
+  });
+
   return (
     <div>
       {query.data?.map((todo) => (
@@ -31,6 +36,15 @@ export default function Home() {
           <span style={{ color: "#888", fontSize: 12 }}>id: {todo.id}</span>
         </div>
       ))}
+      <div>
+        <form onSubmit={handleSubmit}>
+          <input type="text" value={input} onChange={handleInputChange} />
+          <button type="submit">send</button>
+        </form>
+        {messages.map((message) => (
+          <div key={message.id}>{message.content}</div>
+        ))}
+      </div>
     </div>
   );
 }
